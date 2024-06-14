@@ -1,4 +1,5 @@
-use std::collections::HashMap;
+
+use fxhash::FxHashMap as HashMap;
 use std::hash::{Hash, Hasher};
 
 use super::categorize::EdgeProperties;
@@ -65,7 +66,7 @@ pub struct Edge {
     pub geometry: Vec<Coord>,
     pub properties: EdgeProperties,
     pub nodes: Vec<NodeId>,
-    pub tags: std::collections::HashMap<String, String>,
+    pub tags: HashMap<String, String>,
 }
 
 impl Hash for Edge {

@@ -1,7 +1,9 @@
 use super::categorize::*;
 use super::models::*;
 use osmpbfreader::objects::{NodeId, WayId};
-use std::collections::{HashMap, HashSet};
+// use std::collections::{HashMap, HashSet};
+use fxhash::FxHashMap as HashMap;
+use fxhash::FxHashSet as HashSet;
 
 // Way as represented in OpenStreetMap
 struct Way {
@@ -120,7 +122,7 @@ impl Reader {
         let initial_edges_count = edges.len();
 
         // We build an adjacency map for every node that might have exactly two edges
-        let mut neighbors: HashMap<NodeId, Vec<_>> = HashMap::new();
+        let mut neighbors: HashMap<NodeId, Vec<_>> = HashMap::default();
         for edge in edges.iter() {
             // Extremities of a way in `count_nodes_uses` are counted twice to avoid pruning deadends.
             // We want to look at nodes with at two extremities, hence 4 uses
@@ -136,7 +138,7 @@ impl Reader {
         }
 
         let mut result = Vec::new();
-        let mut already_merged = HashSet::new();
+        let mut already_merged = HashSet::default();
         for (node, edges) in neighbors.drain() {
             // We merge two edges at the node if there are only two edges
             // The edges must have the same accessibility properties
@@ -198,7 +200,7 @@ impl Reader {
         for obj in pbf.par_iter().flatten() {
             if let osmpbfreader::OsmObj::Way(way) = obj {
                 let mut properties = EdgeProperties::default();
-                let mut tags = HashMap::new();
+                let mut tags = HashMap::default();
                 for (key, val) in way.tags.iter() {
                     properties.update(key.to_string(), val.to_string());
                     if self.tags_to_read.contains(key.as_str()) {
@@ -294,7 +296,7 @@ fn test_count_nodes() {
         nodes: vec![NodeId(1), NodeId(2), NodeId(3)],
         ..Default::default()
     }];
-    let mut nodes = HashMap::new();
+    let mut nodes = HashMap::default();
     nodes.insert(NodeId(1), Node::default());
     nodes.insert(NodeId(2), Node::default());
     nodes.insert(NodeId(3), Node::default());
@@ -313,7 +315,7 @@ fn test_count_nodes() {
 
 #[test]
 fn test_split() {
-    let mut nodes = HashMap::new();
+    let mut nodes = HashMap::default();
     nodes.insert(NodeId(1), Node::default());
     nodes.insert(NodeId(2), Node::default());
     nodes.insert(NodeId(3), Node::default());
